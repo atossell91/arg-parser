@@ -12,10 +12,17 @@ namespace AntSpace {
     private:
         using workFunc = std::function<void(ArgData)>;
 
+        workFunc subCommandFunction;
         std::map<std::string, workFunc> actions;
+        bool useSubCommand = true;
+
     public:
         bool IsArg(const char* arg);
         void AddAction(const std::string& name, workFunc func) { actions.emplace(name, func); }
+
+        void EnableSubCommand() { useSubCommand = true; }
+        void DisableSubCommand() { useSubCommand = false; }
+        void AddSubCommandFunction(workFunc function) { subCommandFunction = function; }
 
         int SkipHyphens(const char*);
 

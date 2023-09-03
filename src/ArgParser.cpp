@@ -23,10 +23,6 @@ int ArgParser::SkipHyphens(const char* str) {
 int ArgParser::GetArg(int ArrIndex, int ArrSize, const char* Args[], ArgData& Data) {
     
     const char* arg = Args[ArrIndex];
-    
-    if (!IsArg(arg)) {
-        return -1;
-    }
 
     int nameStart = SkipHyphens(arg);
     Data.Name = &arg[nameStart];
@@ -48,14 +44,33 @@ bool ArgParser::ParseArgs(int argc, const char* argv[]) {
     }
 
     int index = 1;
+    if (useSubCommand) {
+
+        if (IsArg(argv[index])) {
+            std::cout << "Sub-command error: First command shouldn't start with '-'" << std::endl;
+            return false;
+        }
+
+        ArgData subCommandData;
+        index = GetArg(index, argc, argv, subCommandData);
+        subCommandFunction(subCommandData);
+    }
+
     while (index < argc) {
         ArgData data;
+
+        const char* arg = argv[index];
+
+        if (arg[0] != '-') {
+            std::cout << "Parse error: No preceding '-'" << std::endl;
+            return false;
+        }
 
         int argResult = GetArg(index, argc, argv, data);
 
         if (argResult < 0) {
             std::cout << "Parse Error: "
-            << "Arg, \'" << argv[index] << "\'"
+            << "Arg, \'" << arg << "\'"
             << std::endl;
             return false;
         }
